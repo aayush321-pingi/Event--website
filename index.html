@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechNova | College Hackathon Fest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #2000fd;
+            --secondary: #00ffbf;
+            --dark: #0a0a16;
+            --light: #f5f5ff;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, rgba(32,0,253,0.4) 0%, rgba(0,255,191,0.3) 100%), 
+                        url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/00b4bb05-8fb1-4489-b029-fd0172a381a8.png') center/cover no-repeat;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            backdrop-filter: blur(3px);
+            background-color: rgba(10,10,22,0.5);
+        }
+        
+        .event-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 255, 191, 0.3);
+            border-color: var(--secondary);
+        }
+        
+        .event-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(32,0,253,0.6) 0%, rgba(0,255,191,0.5) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .event-card:hover::after {
+            opacity: 1;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: var(--dark);
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+        
+        .countdown-digit {
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 0 5px;
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            position: relative;
+        }
+        
+        .countdown-digit::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            border: 2px solid var(--light);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 25px;
+            width: 2px;
+            height: calc(100% - 15px);
+            background-color: var(--light);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 191, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 255, 191, 0);
+            }
+        }
+        
+        .cta-button {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+        }
+        
+        @keyframes glitch {
+            0%, 100% {
+                transform: translate(0);
+                opacity: 1;
+            }
+            99% {
+                transform: translate(0);
+                opacity: 1;
+            }
+            20%, 60% {
+                transform: translate(-5px, 5px);
+                opacity: 0.8;
+            }
+            40%, 80% {
+                transform: translate(5px, -5px);
+                opacity: 0.8;
+            }
+        }
+        
+        .glitch-effect {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .glitch-effect::before {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            color: var(--secondary);
+            z-index: -1;
+            transform: translate(5px, 5px);
+            opacity: 0.7;
+        }
+        
+        .hover-effect:hover {
+            animation: glitch 0.5s linear;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero {
+                height: auto;
+                padding: 200px 0;
+            }
+            
+            .event-card {
+                margin-bottom: 20px;
+            }
+            
+            .countdown-digit {
+                font-size: 1.5rem;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-black/50 backdrop-blur-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/63e2d21d-f310-4c05-8239-c5d30a0e5de0.png" alt="TechNova College Fest logo - A futuristic tech interface with circuits and binary code" class="h-12 w-12 mr-2">
+                <span class="text-2xl font-bold hover-effect" data-text="TechNova">TechNova</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#about" class="text-white hover:text-amber-400 transition">About</a>
+                <a href="#events" class="text-white hover:text-amber-400 transition">Events</a>
+                <a href="#schedule" class="text-white hover:text-amber-400 transition">Schedule</a>
+                <a href="#contact" class="text-white hover:text-amber-400 transition">Contact</a>
+            </div>
+            <button class="md:hidden text-white text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero flex items-center justify-center">
+        <div class="hero-content text-center px-8 py-16 rounded-lg max-w-4xl mx-auto">
+            <div class="floating">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 glitch-effect" data-text="TechNova 2023">TechNova 2025</h1>
+                <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">The premier inter-college technical hackathon pushing boundaries of innovation</p>
+                <div class="flex gap-4 justify-center">
+                    <a href="#events" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-pink-600 rounded-full font-bold cta-button">
+                        Explore Events
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 bg-gradient-to-b from-black to-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-16 text-center">About the <span class="text-amber-400 hover-effect" data-text="Festival">Fest</span></h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8371e519-6397-47a1-bd25-f352872ab5dc.png" alt="College students working together on tech project in modern lab with glowing screens and coding interfaces" class="rounded-lg shadow-2xl w-full">
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold mb-6">Central Level Technical Hackathon</h3>
+                    <p class="mb-6 text-lg leading-relaxed">
+                        TechNova is the most prestigious inter-college technical festival, bringing together brilliant minds from across universities to solve real-world problems through technology. This year's theme focuses on sustainable innovation for future societies.
+                    </p>
+                    <p class="mb-6 text-lg leading-relaxed">
+                        With competitions across software, hardware, and emerging technologies, participants will have 36 hours to conceptualize, build, and present their solutions to a panel of industry experts and academic leaders.
+                    </p>
+                    <div class="grid grid-cols-3 gap-4 text-center mt-12">
+                        <div>
+                            <div class="text-4xl font-bold countdown-digit" data-label="Tech">12+</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold countdown-digit" data-label="Colleges">50+</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold countdown-digit" data-label="Hours">36</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Events Section -->
+    <section id="events" class="py-20 px-4 bg-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-16 text-center">Hackathon <span class="text-amber-400 hover-effect" data-text="Tracks">Tracks</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Software Track Card -->
+                <div class="event-card rounded-xl p-6" onclick="openModal('software')">
+                    <div class="bg-gray-800/50 rounded-lg p-4 mb-6 text-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/42fa956d-5b25-400d-937f-0b2f8925439f.png" alt="Software development icon with code brackets and screen elements" class="mx-auto h-16">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-amber-400">Software Solutions</h3>
+                    <p class="mb-4 text-gray-300">
+                        Build innovative software applications that solve pressing societal issues. Use any tech stack within competition guidelines.
+                    </p>
+                    <div class="text-sm text-gray-400">
+                        <span class="block mb-1"><i class="fas fa-code mr-2"></i> Web, Mobile, AI/ML projects</span>
+                        <span class="block mb-1"><i class="fas fa-users mr-2"></i> Team of 2-4 participants</span>
+                        <span class="block mb-1"><i class="fas fa-trophy mr-2"></i> Prize: ₹50,000</span>
+                    </div>
+                    <div class="mt-6 py-2 px-4 bg-gray-800 inline-flex items-center rounded-full">
+                        <span class="text-xs tracking-widest font-bold">TAP FOR RULES</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Hardware Track Card -->
+                <div class="event-card rounded-xl p-6" onclick="openModal('hardware')">
+                    <div class="bg-gray-800/50 rounded-lg p-4 mb-6 text-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a7a18664-7b71-4b8a-9bf6-8a88671de03c.png" alt="Hardware circuit board with glowing chips and connected wires" class="mx-auto h-16">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-amber-400">Hardware Innovations</h3>
+                    <p class="mb-4 text-gray-300">
+                        Design and prototype hardware solutions that push technological boundaries. Limited components will be provided.
+                    </p>
+                    <div class="text-sm text-gray-400">
+                        <span class="block mb-1"><i class="fas fa-microchip mr-2"></i> IoT, Robotics, Embedded Systems</span>
+                        <span class="block mb-1"><i class="fas fa-users mr-2"></i> Team of 2-4 participants</span>
+                        <span class="block mb-1"><i class="fas fa-trophy mr-2"></i> Prize: ₹75,000</span>
+                    </div>
+                    <div class="mt-6 py-2 px-4 bg-gray-800 inline-flex items-center rounded-full">
+                        <span class="text-xs tracking-widest font-bold">TAP FOR RULES</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Registration Card -->
+                <div class="event-card rounded-xl p-6" onclick="openModal('register')">
+                    <div class="bg-gray-800/50 rounded-lg p-4 mb-6 text-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f3505a3f-39c9-4cd6-b982-1b34e3ade5d0.png" alt="Clipboard with tick marks symbolizing registration process" class="mx-auto h-16">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-amber-400">Participant Registration</h3>
+                    <p class="mb-4 text-gray-300">
+                        Secure your spot in Central India's biggest technical hackathon. Early bird registration discounts available until October 15.
+                    </p>
+                    <div class="text-sm text-gray-400">
+                        <span class="block mb-1"><i class="fas fa-calendar mr-2"></i> Deadline: Nov 10, 2025</span>
+                      <!-- <span class="block mb-1"><i class="fas fa-rupee-sign mr-2"></i> Fee: ₹500 per team</span> -->
+                        <span class="block mb-1"><i class="fas fa-utensils mr-2"></i> Includes meals & swag</span>
+                    </div>
+                    <div class="mt-6 py-2 px-4 bg-gray-800 inline-flex items-center rounded-full">
+                        <span class="text-xs tracking-widest font-bold">TAP TO REGISTER</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rules Section -->
+            <div class="mt-20 px-6 py-8 bg-gray-800/50 rounded-lg max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold mb-6 text-center"><i class="fas fa-gavel mr-3 text-amber-400"></i> General Rules & Regulations</h3>
+                <ul class="space-y-4 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="inline-block bg-amber-400 text-black rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-check text-xs"></i></span>
+                        All code/hardware must be developed during the hackathon (reusing standard libraries is allowed)
+                    </li>
+                    <li class="flex items-start">
+                        <span class="inline-block bg-amber-400 text-black rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-check text-xs"></i></span>
+                        Teams must consist of students currently enrolled in any recognized university
+                    </li>
+                    <li class="flex items-start">
+                        <span class="inline-block bg-amber-400 text-black rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-check text-xs"></i></span>
+                        Decision of judges will be final and binding
+                    </li>
+                    <li class="flex items-start">
+                        <span class="inline-block bg-amber-400 text-black rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-check text-xs"></i></span>
+                        Code of conduct must be strictly followed - harassment of any kind will not be tolerated
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Schedule Section -->
+    <section id="schedule" class="py-20 px-4 bg-gradient-to-b from-gray-900 to-black">
+        <div class="container mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-16 text-center">Event <span class="text-amber-400 hover-effect" data-text="Timeline">Timeline</span></h2>
+            
+            <div class="max-w-3xl mx-auto">
+                <div class="timeline-wrapper pl-8 relative">
+                    <div class="timeline-item timeline-animate opacity-0">
+                        <h3 class="text-2xl font-bold mb-2">Registration Opens</h3>
+                        <div class="text-amber-400 mb-2"><i class="far fa-calendar-alt mr-2"></i> September 1, 2025</div>
+                        <p class="text-gray-300">Early bird registrations begin with 20% discount for first 50 teams.</p>
+                    </div>
+                    
+                    <div class="timeline-item timeline-animate opacity-0">
+                        <h3 class="text-2xl font-bold mb-2">Problem Statements Released</h3>
+                        <div class="text-amber-400 mb-2"><i class="far fa-calendar-alt mr-2"></i> October 15, 2025</div>
+                        <p class="text-gray-300">Thematic tracks and specific problem statements will be announced.</p>
+                    </div>
+                    
+                    <div class="timeline-item timeline-animate opacity-0">
+                        <h3 class="text-2xl font-bold mb-2">Hackathon Begins</h3>
+                        <div class="text-amber-400 mb-2"><i class="far fa-calendar-alt mr-2"></i> November 18, 2025 @ 9:00 AM</div>
+                        <p class="text-gray-300">Opening ceremony followed by 36 hours of intense hacking with access to mentors.</p>
+                    </div>
+                    
+                    <div class="timeline-item timeline-animate opacity-0">
+                        <h3 class="text-2xl font-bold mb-2">Submission Deadline</h3>
+                        <div class="text-amber-400 mb-2"><i class="far fa-calendar-alt mr-2"></i> November 19, 2025 @ 9:00 PM</div>
+                        <p class="text-gray-300">All projects must be submitted with required documentation before deadline.</p>
+                    </div>
+                    
+                    <div class="timeline-item timeline-animate opacity-0">
+                        <h3 class="text-2xl font-bold mb-2">Winners Announced</h3>
+                        <div class="text-amber-400 mb-2"><i class="far fa-calendar-alt mr-2"></i> November 20, 2025 @ 4:00 PM</div>
+                        <p class="text-gray-300">Final presentations followed by awards ceremony and networking event.</p>
+                    </div>
+                </div><!-- .timeline-wrapper -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-4 bg-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-16 text-center">Get in <span class="text-amber-400 hover-effect" data-text="Touch">Touch</span></h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div class="lg:col-span-2">
+                    <div class="bg-gray-800/50 rounded-lg p-8">
+                        <h3 class="text-2xl font-bold mb-6">Organizing Club</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-bold mb-4 text-amber-400 flex items-center">
+                                    <i class="fas fa-university mr-3"></i> About TECHNOLANCERS Club
+                                </h4>
+                                <p class="mb-4 text-gray-300">
+                                    The Computer Society of India club is the premier technical organization at our college, established in 1990. We organize workshops, hackathons, and tech talks year-round.
+                                </p>
+                                <p class="text-gray-300">
+                                    Our mission is to foster technical excellence among students through hands-on learning and real-world problem solving.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-4 text-amber-400 flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-3"></i> Venue Details
+                                </h4>
+                                <address class="mb-4 text-gray-300 not-italic">
+                                    <p class="mb-2">JIET UNIVERSE</p>
+                                    <p class="mb-2">COMING <SOON class=""></SOON></p>
+                                    <p class="mb-2">PALI ROAD, Tech Zone</p>
+                                    <p>JODHPUR,RAJASTHAN</p>
+                                </address>
+                                
+                                <div class="mt-6">
+                                    <h5 class="text-lg font-bold mb-2 text-gray-300">Club Email</h5>
+                                    <p class="text-amber-400"><i class="fas fa-envelope mr-2"></i> COMING SOON</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-gray-800/50 rounded-lg p-8 h-full">
+                        <h3 class="text-2xl font-bold mb-6">Contact Team</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-bold mb-2 text-gray-300">Event Coordinator</h4>
+                                <p class="text-amber-400"><i class="fas fa-user mr-2"></i> MR AAYUSH MAHESHWARI</p>
+                                <p class="text-gray-300"><i class="fas fa-phone mr-2"></i> COMING SOON</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold mb-2 text-gray-300">Student Head</h4>
+                                <p class="text-amber-400"><i class="fas fa-user mr-2"></i> COMNG SOON</p>
+                                <p class="text-gray-300"><i class="fas fa-mobile-alt mr-2"></i> COMING SOON</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold mb-2 text-gray-300">Tech Support</h4>
+                                <p class="text-amber-400"><i class="fas fa-headset mr-2"></i> COMING SOON</p>
+                                <p class="text-gray-300"><i class="fas fa-phone mr-2"></i> SOON</p>
+                            </div>
+                            
+                            <div class="pt-6">
+                                <h4 class="font-bold mb-4 text-gray-300">Connect With Us</h4>
+                                <div class="flex space-x-6">
+                                    <a href="#" class="social-icon text-2xl text-amber-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                                    <a href="#" class="social-icon text-2xl text-amber-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                                    <a href="#" class="social-icon text-2xl text-amber-400 hover:text-white"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="social-icon text-2xl text-amber-400 hover:text-white"><i class="fab fa-github"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-black text-center">
+        <div class="container mx-auto">
+            <div class="flex justify-center mb-8">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/288de3bf-41aa-4519-b9ce-6a0b182ed7d6.png" alt="CSI Club logo with computer society emblem" class="h-10 mr-4">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/dea33270-fcc9-406f-8d06-338bc338ff63.png" alt="College name and crest in formal typography" class="h-10">
+            </div>
+            
+            <div class="max-w-2xl mx-auto text-gray-400 mb-8">
+                <p class="mb-4">
+                    TechNova 2023 is organized by the Computer Society of India Student Chapter in association with the Department of Computer Science.
+                </p>
+                <p>
+                    All content and materials on this website are the property of JIET UNIVERSE and may not be reproduced without permission.
+                </p>
+            </div>
+            
+            <div class="pt-6 border-t border-gray-800">
+                <p class="text-gray-500">
+                    © 2025 TECHNOLANCERS Club - JIET UNIVERSE. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modals -->
+    <div id="software-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('software')">&times;</span>
+            <h3 class="text-2xl font-bold mb-6 text-amber-400">Software Hackathon Details</h3>
+            <div class="mb-6">
+                <h4 class="text-xl font-bold mb-3">Problem Statements:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                    <li>Develop an AI-powered tool for early detection of learning disabilities in children</li>
+                    <li>Create a blockchain-based agricultural supply chain verification system</li>
+                    <li>Build an AR application for heritage site preservation and virtual tours</li>
+                    <li>Develop a mental health chatbot with sentiment analysis capabilities</li>
+                </ul>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="text-xl font-bold mb-3">Judging Criteria (100 points):</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                    <li>Innovation (30 points)</li>
+                    <li>Technical Complexity (25 points)</li>
+                    <li>User Experience (20 points)</li>
+                    <li>Potential Impact (15 points)</li>
+                    <li>Presentation (10 points)</li>
+                </ul>
+            </div>
+            
+            <a href="https://forms.gle/softwaretrack2023" target="_blank" class="inline-block mt-6 px-8 py-3 bg-gradient-to-r from-amber-500 to-pink-600 rounded-full font-bold">
+                View Full Rules & Register
+            </a>
+        </div>
+    </div>
+    
+    <div id="hardware-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('hardware')">&times;</span>
+            <h3 class="text-2xl font-bold mb-6 text-amber-400">Hardware Hackathon Details</h3>
+            <div class="mb-6">
+                <h4 class="text-xl font-bold mb-3">Problem Statements:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                    <li>Design an IoT solution for monitoring air quality in smart cities</li>
+                    <li>Create an assistive technology device for differently-abled individuals</li>
+                    <li>Build a low-cost water purification monitoring system for rural areas</li>
+                    <li>Develop an energy-efficient home automation system</li>
+                </ul>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="text-xl font-bold mb-3">Provided Components:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                    <li>Arduino/Raspberry Pi boards (limited quantities)</li>
+                    <li>Basic sensors (temperature, motion, humidity, etc.)</li>
+                    <li>Standard electronic components (resistors, capacitors, etc.)</li>
+                    <li>3D printing access for prototyping (time slots available)</li>
+                </ul>
+            </div>
+            
+            <a href="https://forms.gle/hardwaretrack2023" target="_blank" class="inline-block mt-6 px-8 py-3 bg-gradient-to-r from-amber-500 to-pink-600 rounded-full font-bold">
+                View Full Rules & Register
+            </a>
+        </div>
+    </div>
+    
+    <div id="register-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('register')">&times;</span>
+            <h3 class="text-2xl font-bold mb-6 text-amber-400">Hackathon Registration</h3>
+            <div class="mb-6">
+                <h4 class="text-xl font-bold mb-3">Registration Process:</h4>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                    <li>Complete the Google Form with all team member details</li>
+                    <li>Upload scanned copy of student ID cards</li>
+                    <li>Make payment through provided UPI/Payment Gateway</li>
+                    <li>Receive confirmation email within 48 hours</li>
+                </ol>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="text-xl font-bold mb-3">Important Dates:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                    <li>Early Bird Registration: Until Oct 15 (₹400 per team)</li>
+                    <li>Standard Registration: Oct 16 - Nov 10 (₹500 per team)</li>
+                    <li>Late Registration (if available): Nov 11-15 (₹750 per team)</li>
+                </ul>
+            </div>
+            
+            <a href="https://forms.gle/hackathonreg2023" target="_blank" class="inline-block mt-6 px-8 py-3 bg-gradient-to-r from-amber-500 to-pink-600 rounded-full font-bold">
+                Proceed to Registration Form
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Modal functionality
+        function openModal(type) {
+            document.getElementById(`${type}-modal`).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(type) {
+            document.getElementById(`${type}-modal`).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Close modal when clicking outside content
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    const modalId = this.id.split('-')[0];
+                    closeModal(modalId);
+                }
+            });
+        });
+        
+        // Countdown timer - example for event day
+        function updateCountdown() {
+            const eventDate = new Date('November 18, 2023 09:00:00').getTime();
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+            
+            if (distance > 0) {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                document.getElementById('countdown-days').textContent = days;
+            }
+        }
+        
+        // Initialize countdown
+        updateCountdown();
+        setInterval(updateCountdown, 1000 * 60 * 60); // Update hourly
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.md\\:hidden');
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                // Implement mobile menu toggle logic here
+                console.log('Mobile menu toggled');
+            });
+        }
+        
+        // Animations on scroll
+        window.addEventListener('scroll', () => {
+            // Implement scroll animations as needed
+        });
+        
+        // Animate timeline items on scroll
+        function animateTimeline() {
+            document.querySelectorAll('.timeline-animate').forEach(item => {
+                const rect = item.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) {
+                    item.classList.add('animate__animated', 'animate__fadeInUp');
+                    item.classList.remove('opacity-0');
+                }
+            });
+        }
+        window.addEventListener('scroll', animateTimeline);
+        window.addEventListener('DOMContentLoaded', animateTimeline);
+    </script>
+</body>
+</html>
+
